@@ -1,0 +1,55 @@
+{
+	"build_systems":
+	[
+		{
+			"cmd":
+			[
+				"make"
+			],
+			"name": "optimal",
+			"variants":
+			[
+				{
+					"cmd":
+					[
+						"$project_path/bin/$file_base_name"
+					],
+					"name": "Run",
+					"shell": true
+				},
+				{
+					"cmd":
+					[
+						"cmake",
+						".."
+					],
+					"name": "cmake",
+					"working_dir": "$project_path/build"
+				},
+				{
+					"cmd":
+					[
+						"doxygen",
+						"Doxyfile"
+					],
+					"name": "doxygen",
+					"working_dir": "$project_path"
+				}
+			],
+			"working_dir": "$project_path/build"
+		},
+		{
+			"file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
+			"name": "Anaconda Python Builder",
+			"selector": "source.python",
+			"shell_cmd": "python -u \"$file\""
+		}
+	],
+	"folders":
+	[
+		{
+			"follow_symlinks": true,
+			"path": "."
+		}
+	]
+}
