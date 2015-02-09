@@ -19,7 +19,7 @@
 //------------------------------------------------------------------------------
 #include <functional>
 #include <Eigen/Dense>
-
+#include <vector>
 #include <iostream>
 
 
@@ -31,9 +31,8 @@ namespace optimal
 
 
 //------------------------------------------------------------------------------
-// Typedefs end Enums
+// Typedefs
 //------------------------------------------------------------------------------
-
 
 /**
 * @class System
@@ -60,7 +59,7 @@ public:
     //--------------------------------------------------------------------------
     // Public Constants, Enums, and Types
     //--------------------------------------------------------------------------
-    enum direction {
+    enum Direction {
         FORWARD=1,
         BACKWARD=-1
     };
@@ -125,7 +124,7 @@ public:
     Eigen::VectorXd simulate(Eigen::VectorXd init_state,
                              double init_time,
                              double duration,
-                             double time_step);
+                             Direction dir=FORWARD);
 
 
 
