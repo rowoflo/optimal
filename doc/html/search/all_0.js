@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['f',['f',['../classoptimal_1_1_system.html#ae42fed57a1daa6ea48a202337f7d5a0a',1,'optimal::System']]]
+  ['controller',['controller',['../classoptimal_1_1_system.html#a487b8397d7a8b13a50e1b6fa3af82aa3',1,'optimal::System']]]
 ];

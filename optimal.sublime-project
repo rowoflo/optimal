@@ -12,7 +12,8 @@
 				{
 					"cmd":
 					[
-						"$project_path/bin/$file_base_name"
+						// "$project_path/bin/$file_base_name"
+						"$project_path/bin/system_test"
 					],
 					"name": "Run",
 					"shell": true

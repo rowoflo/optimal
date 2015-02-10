@@ -1,8 +1,11 @@
 //------------------------------------------------------------------------------
 // Includes
 //------------------------------------------------------------------------------
-#include "system.h"
+#include "trajectory.h"
 
+#include <iostream>
+#include <boost/format.hpp>
+#include <boost/numeric/odeint.hpp>
 
 //------------------------------------------------------------------------------
 // Namespaces
@@ -32,31 +35,15 @@ namespace optimal
 // Lifecycle
 //------------------------------------------------------------------------------
 // Constructors
-System::System(TimeType time_step,
-               unsigned int state_dim,
-               unsigned int input_dim,
-               unsigned int output_dim)
+Trajectory::Trajectory(unsigned int state_dim,
+                       unsigned int input_dim)
 :
-ts_(time_step),
 N_(state_dim),
-M_(input_dim),
-L_(output_dim)
+M_(input_dim)
 {
-    dynamics = [=] (StateType x, VectorXd u, TimeType t)
-    {
-        return StateType::Zero(N_);
-    };
 
-    controller = [=] (StateType x, TimeType t)
-    {
-        return InputType::Zero(M_);
-    };
-
-    input_constraint = [=] (InputType u)
-    {
-        return u;
-    };
 }
+
 
 // Destructor
 
@@ -72,7 +59,26 @@ L_(output_dim)
 //------------------------------------------------------------------------------
 // Overloaded Operators
 //------------------------------------------------------------------------------
+std::ostream& operator<< (std::ostream &out, Trajectory &traj)
+{
+    TimeType t;
+    StateType x;
+    InputType u;
 
+    cout << boost::format("%1$=10s  |  %2$=30s  |  %3$=10s  |\n")
+                          % "Time" % "State" % "Input";
+
+    for (int i=0; i<traj.time_tape_.size(); ++i) {
+        t = traj.time_tape_[i];
+        x = traj.state_tape_[i];
+        u = traj.input_tape_[i];
+
+        cout << boost::format("%1$-10.3f  |  %2$-30.3f  |  %3$-10.3f  |\n")
+                % t % x.transpose() % u.transpose();
+        out << "\n";
+    }
+    return out;
+}
 
 
 //------------------------------------------------------------------------------
@@ -84,54 +90,18 @@ L_(output_dim)
 //------------------------------------------------------------------------------
 // Public Member Functions
 //------------------------------------------------------------------------------
-InputType System::input(StateType x, TimeType t)
+void Trajectory::push_back(TimeType t, StateType x)
 {
-    return input_constraint(controller(x, t));
+    InputType u;
+    u = u.setZero(M_)*NAN;
+    push_back(t, x, u);
 }
 
-Trajectory System::simulate(StateType init_state,
-                            TimeType init_time,
-                            TimeType duration,
-                            System::Direction dir)
+void Trajectory::push_back(TimeType t, StateType x, InputType u)
 {
-    // Initialize integration variables
-    Stepper stepper;
-    stepper.initialize(init_state, init_time, duration*init_step_factor_);
-    pair< TimeType, TimeType > time_interval;
-
-    auto dyn = [this] (const StateType x, StateType &dxdt, const TimeType t)
-    {
-        dxdt = dynamics(x, input(x,t), t);
-    };
-
-    TimeType t = init_time;
-    TimeType T = duration;
-    TimeType tf = t + T;
-    unsigned int k = 1;
-
-    StateType x = init_state;
-    InputType u(M_);
-
-    Trajectory traj(N_,M_);
-
-    // Simulate
-    u = input(x, t);
-    traj.push_back(t, x, u);
-    while (t<tf) {
-        time_interval = stepper.do_step(dyn);
-        t = time_interval.second;
-        while (k*ts_<t && k*ts_<tf) {
-            stepper.calc_state(k*ts_, x);
-            u = input(x, t);
-            traj.push_back(k*ts_, x, u);
-            k++;
-        }
-    }
-    stepper.calc_state(tf, x);
-    u = input(x, t);
-    traj.push_back(k*ts_, x, u);
-
-    return traj;
+    time_tape_.push_back(t);
+    state_tape_.push_back(x);
+    input_tape_.push_back(u);
 }
 
 
@@ -145,5 +115,17 @@ Trajectory System::simulate(StateType init_state,
 // Private Member Functions
 //------------------------------------------------------------------------------
 
+
+
+// #include <boost/iterator/zip_iterator.hpp>
+// #include <boost/range.hpp>
+
+// template <typename... T>
+// auto zip(const T&... containers) -> boost::iterator_range<boost::zip_iterator<decltype(boost::make_tuple(std::begin(containers)...))>>
+// {
+//     auto zip_begin = boost::make_zip_iterator(boost::make_tuple(std::begin(containers)...));
+//     auto zip_end = boost::make_zip_iterator(boost::make_tuple(std::end(containers)...));
+//     return boost::make_iterator_range(zip_begin, zip_end);
+// }
 
 } // namespace optimal

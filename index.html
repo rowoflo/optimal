@@ -35,9 +35,21 @@
 
 <a id="optimal-cpp-library" class="anchor" href="#opimtal-cpp-library" aria-hidden="true"><span class="octicon octicon-link"></span></a>Optimal C++ Library</h3>
 
-<p>I am just getting started on this library, so there is nothing here yet.</p>
+<p>I am just getting started on this library, so there is not much here yet.</p>
 
 <p>You can see the latest progress on the library by checking out the <a href="doc/html/index.html">Doxygen</a> documentation page.</p>
+
+<a id="disclaimer" class="anchor" href="#disclaimer" aria-hidden="true"><span class="octicon octicon-link"></span></a>Disclaimer</h3>
+
+<p>I am not a software developer. I am a roboticist that likes writing code and learning about software development. However, I still have a lot to learn. With that... if you see things in the code that do not seem right, can be done much simpler, or are usually done differently, let me know. I always enjoy learning how to code better.</p>
+
+<a id="notes" class="anchor" href="#notes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Notes</h3>
+
+<p>Here are my notes as go along</p>
+<dl>
+  <dt>* Homebrew Boost Odeint and Eigen</dt>
+  <dd>It seems that the <a href="http://brewformulas.org/Boost">Boost odeint</a> installed by Homebrew is not the current version of <a href="http://headmyshoulder.github.io/odeint-v2/index.html">odeint</a>. This was a problem because the latest odeint has added an extra template parameter "value_type", which allows state variable types of Eigen matrices to be possible. To get this to work I downloaded the new odeint and replaced the include files of the Homebrew Boost odeint with the latest version. On my machine the files are located at /usr/local/Cellar/boost/1.57.0/include/boost/numeric/odeint.</dd>
+</dl>
 
 <!-- <h3>
 <a id="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages" aria-hidden="true"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>

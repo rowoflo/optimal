@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.7"/>
-<title>optimal: Class List</title>
+<title>optimal: optimal::Trajectory Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -59,12 +59,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   </div>
   <div id="navrow2" class="tabs2">
     <ul class="tablist">
-      <li class="current"><a href="annotated.html"><span>Class&#160;List</span></a></li>
+      <li><a href="annotated.html"><span>Class&#160;List</span></a></li>
       <li><a href="classes.html"><span>Class&#160;Index</span></a></li>
       <li><a href="functions.html"><span>Class&#160;Members</span></a></li>
     </ul>
   </div>
-</div><!-- top -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -79,18 +78,57 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </iframe>
 </div>
 
+<div id="nav-path" class="navpath">
+  <ul>
+<li class="navelem"><b>optimal</b></li><li class="navelem"><a class="el" href="classoptimal_1_1_trajectory.html">Trajectory</a></li>  </ul>
+</div>
+</div><!-- top -->
 <div class="header">
+  <div class="summary">
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#friends">Friends</a> &#124;
+<a href="classoptimal_1_1_trajectory-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">Class List</div>  </div>
+<div class="title">optimal::Trajectory Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock">Here are the classes, structs, unions and interfaces with brief descriptions:</div><div class="directory">
-<div class="levels">[detail level <span onclick="javascript:toggleLevel(1);">1</span><span onclick="javascript:toggleLevel(2);">2</span>]</div><table class="directory">
-<tr id="row_0_" class="even"><td class="entry"><span style="width:0px;display:inline-block;">&#160;</span><span id="arr_0_" class="arrow" onclick="toggleFolder('0_')">&#9660;</span><span class="icona"><span class="icon">N</span></span><b>optimal</b></td><td class="desc"></td></tr>
-<tr id="row_0_0_"><td class="entry"><span style="width:32px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="classoptimal_1_1_system.html" target="_self">System</a></td><td class="desc">A class for dynamical systems </td></tr>
-<tr id="row_0_1_" class="even"><td class="entry"><span style="width:32px;display:inline-block;">&#160;</span><span class="icona"><span class="icon">C</span></span><a class="el" href="classoptimal_1_1_trajectory.html" target="_self">Trajectory</a></td><td class="desc">A container class for storing dynamical system trajectories </td></tr>
+
+<p>A container class for storing dynamical system trajectories.  
+ <a href="classoptimal_1_1_trajectory.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="trajectory_8h_source.html">trajectory.h</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:a012ad1c4d7b9890ad65890716bbc75b4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a012ad1c4d7b9890ad65890716bbc75b4"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>Trajectory</b> (unsigned int state_dim=1, unsigned int input_dim=0)</td></tr>
+<tr class="separator:a012ad1c4d7b9890ad65890716bbc75b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2ed9c7db9acd4b0b11b944f0d4774fd3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2ed9c7db9acd4b0b11b944f0d4774fd3"></a>
+unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>state_dim</b> () const </td></tr>
+<tr class="separator:a2ed9c7db9acd4b0b11b944f0d4774fd3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1adb341b1c1fda784bd71e055ebd6e68"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1adb341b1c1fda784bd71e055ebd6e68"></a>
+unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>input_dim</b> () const </td></tr>
+<tr class="separator:a1adb341b1c1fda784bd71e055ebd6e68"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:affd28251a3e0e8f97d69396789372b18"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="affd28251a3e0e8f97d69396789372b18"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>push_back</b> (TimeType t, StateType x)</td></tr>
+<tr class="separator:affd28251a3e0e8f97d69396789372b18"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adda3f9b681c8ae6f2b5d23a08916cd31"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adda3f9b681c8ae6f2b5d23a08916cd31"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>push_back</b> (TimeType t, StateType x, InputType u)</td></tr>
+<tr class="separator:adda3f9b681c8ae6f2b5d23a08916cd31"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
+Friends</h2></td></tr>
+<tr class="memitem:a2b967cf6a7a50becfc162e6d99d971bf"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2b967cf6a7a50becfc162e6d99d971bf"></a>
+ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator&lt;&lt;</b> (ostream &amp;out, <a class="el" href="classoptimal_1_1_trajectory.html">Trajectory</a> &amp;traj)</td></tr>
+<tr class="separator:a2b967cf6a7a50becfc162e6d99d971bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-</div><!-- directory -->
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>A container class for storing dynamical system trajectories. </p>
+<p>TODO: Detailed description </p>
+</div><hr/>The documentation for this class was generated from the following files:<ul>
+<li>include/<a class="el" href="trajectory_8h_source.html">trajectory.h</a></li>
+<li>src/trajectory.cpp</li>
+</ul>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
