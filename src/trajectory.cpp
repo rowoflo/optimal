@@ -38,8 +38,8 @@ namespace optimal
 Trajectory::Trajectory(unsigned int state_dim,
                        unsigned int input_dim)
 :
-N_(state_dim),
-M_(input_dim)
+n_(state_dim),
+m_(input_dim)
 {
 
 }
@@ -64,17 +64,19 @@ std::ostream& operator<< (std::ostream &out, Trajectory &traj)
     TimeType t;
     StateType x;
     InputType u;
+    CostType J;
 
-    cout << boost::format("%1$=10s  |  %2$=30s  |  %3$=10s  |\n")
-                          % "Time" % "State" % "Input";
+    out << boost::format("%1$=10s  |  %2$=30s  |  %3$=10s  |  %4$=10s  |\n")
+                          % "Time" % "State" % "Input" % "Cost";
 
     for (int i=0; i<traj.time_tape_.size(); ++i) {
         t = traj.time_tape_[i];
         x = traj.state_tape_[i];
         u = traj.input_tape_[i];
+        J = traj.cost_tape_[i];
 
-        cout << boost::format("%1$-10.3f  |  %2$-30.3f  |  %3$-10.3f  |\n")
-                % t % x.transpose() % u.transpose();
+        out << boost::format("%1$-10.3f  |  %2$-30.3f  |  %3$-10.3f  |  %4$-10.3f  |\n")
+                % t % x.transpose() % u.transpose() % J;
         out << "\n";
     }
     return out;
@@ -93,15 +95,22 @@ std::ostream& operator<< (std::ostream &out, Trajectory &traj)
 void Trajectory::push_back(TimeType t, StateType x)
 {
     InputType u;
-    u = u.setZero(M_)*NAN;
+    u = u.setZero(m_)*NAN;
     push_back(t, x, u);
 }
 
 void Trajectory::push_back(TimeType t, StateType x, InputType u)
 {
+    CostType J = NAN;
+    push_back(t, x, u, J);
+}
+
+void Trajectory::push_back(TimeType t, StateType x, InputType u, CostType J)
+{
     time_tape_.push_back(t);
     state_tape_.push_back(x);
     input_tape_.push_back(u);
+    cost_tape_.push_back(J);
 }
 
 

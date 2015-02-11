@@ -53,37 +53,46 @@ int main(int argc, char *argv[])
     double DISTURBANCE = -2;  ///< Disturbance (wind) [N]
     double HEIGHT = 5;        ///< Desired height [m]
 
-    TimeType t0 = 0.0;        ///< Initial time [s]
-    TimeType tf = 8.0;        ///< Final time [s]
+    TimeType t0 = 4.0;        ///< Initial time [s]
+    TimeType tf = 12.0;        ///< Final time [s]
     TimeType ts = 0.1;        ///< Time step [s]
 
-    const unsigned int N = 3; ///< State dimension
-    StateType x0(N);          ///< Initial state vector
+    const unsigned int n = 3; ///< State dimension
+    StateType x0(n);          ///< Initial state vector
     x0 << 0, 0, 0;
 
-    StateType x_bar(N);       ///< State operating point
+    StateType x_bar(n);       ///< State operating point
     x_bar << HEIGHT, 0, 0;
 
-    const unsigned int M = 1; ///< Input dimension
-    InputType u_max(M);       ///< Maximum input
+    const unsigned int m = 1; ///< Input dimension
+    InputType u_max(m);       ///< Maximum input
     u_max << 15.0;
-    InputType u_min(M);       ///< Minimum input
+    InputType u_min(m);       ///< Minimum input
     u_min << 0.0;
-    InputType u_bar(M);       ///< Input operating point
+    InputType u_bar(m);       ///< Input operating point
     u_bar << MASS*GRAVITY;
 
-    MatrixXd A(N,N);          ///< State transition matrix (N x N)
+    MatrixXd A(n,n);          ///< State transition matrix (n x n)
     A << 0, 1, 0,
          0, 0, 0,
          1, 0, 0;
 
-    Vector3d B(N,M);          ///< Input matrix (N x M)
+    Vector3d B(n,m);          ///< Input matrix (n x m)
     B << 0, 1/MASS, 0;
 
-    VectorXd G(N);            ///< Disturbance vector
+    VectorXd G(n);            ///< Disturbance vector
     G << 0, (WIND ? DISTURBANCE/MASS : 0), 0;
 
-    System sys(ts, N, M);     ///< System
+    VectorXd Q(n);            ///< State cost matrix diagonal
+    Q.setOnes();
+
+    VectorXd R(m);            ///< Input cost matrix diagonal
+    R.setOnes();
+
+    VectorXd S(n);            ///< Final state cost matrix diagonal
+    S << 1000, 1000, 1000;
+
+    System sys(ts, n, m);     ///< System
 
     // System dynamics
     sys.dynamics = [&] (StateType x_, InputType u_, TimeType t_)
@@ -96,7 +105,7 @@ int main(int argc, char *argv[])
 
     ControllerParams params;
     params.constant = 12.0;
-    params.pid = {10, .5, 5};
+    params.pid = {10, 0, 5};
 
     switch (controller_type) {
         case NONE:
@@ -105,7 +114,7 @@ int main(int argc, char *argv[])
         case CONSTANT:
             sys.controller = [=] (StateType x_, TimeType t_) ///< System controller
             {
-                InputType u_(M);
+                InputType u_(m);
                 u_ << params.constant;
                 return u_;
             };
@@ -117,8 +126,8 @@ int main(int argc, char *argv[])
                 double p_ = params.pid[0];
                 double i_ = params.pid[1];
                 double d_ = params.pid[2];
-                Matrix<double, M, N> K(p_, d_, i_);
-                InputType u_(M);
+                Matrix<double, m, n> K(p_, d_, i_);
+                InputType u_(m);
                 u_ = -K*(x_ - x_bar) + u_bar;
                 return u_;
             };
@@ -137,10 +146,34 @@ int main(int argc, char *argv[])
         return u_;
     };
 
-    // Simulate
-    Trajectory traj = sys.simulate(x0, t0, tf);
+    // Cost
+    sys.state_cost = [&] (StateType x_) ///< State cost
+    {
+        return (x_-x_bar).transpose() * Q.asDiagonal() * (x_-x_bar);
+    };
 
-    // Print results
+    sys.input_cost = [&] (InputType u_) ///< Input cost
+    {
+        return u_.transpose() * R.asDiagonal() * u_;
+    };
+
+    sys.final_state_cost = [&] (StateType xf_) ///< Final state cost
+    {
+        return (xf_-x_bar).transpose() * S.asDiagonal() * (xf_-x_bar);
+    };
+
+    // Simulate
+    Trajectory traj = sys.simulate(x0, t0, tf-t0);
+    StateType xf = traj.state(traj.size()-1);
     cout << traj << endl;
+    cout << xf.transpose() << endl;
+
+    // StateType xf(n);
+    // xf << 5.18125, -0.00929819, -3.53298;
+    // Trajectory traj = sys.simulate(xf, tf, tf-t0, optimal::System::BACKWARD);
+    traj = sys.simulate(xf, tf, tf-t0, optimal::System::BACKWARD);
+    cout << traj << endl;
+
+
 
 }

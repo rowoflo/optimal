@@ -37,6 +37,7 @@ typedef double TimeType;
 typedef VectorXd StateType;
 typedef VectorXd InputType;
 typedef VectorXd OutputType;
+typedef double CostType;
 
 
 /**
@@ -95,15 +96,20 @@ public:
     //--------------------------------------------------------------------------
     // Getters and Setters
     //--------------------------------------------------------------------------
-    unsigned int state_dim() const { return N_; };
-    unsigned int input_dim() const { return M_; };
-
+    TimeType time(unsigned int i) const { return time_tape_[i]; };
+    unsigned int state_dim() const { return n_; };
+    StateType state(unsigned int i) const { return state_tape_[i]; };
+    unsigned int input_dim() const { return m_; };
+    InputType input(unsigned int i) const { return input_tape_[i]; };
+    CostType cost(unsigned int i) const { return cost_tape_[i]; };
 
     //--------------------------------------------------------------------------
     // Public Member Functions
     //--------------------------------------------------------------------------
+    unsigned int size() const { return time_tape_.size(); };
     void push_back(TimeType t, StateType x);
     void push_back(TimeType t, StateType x, InputType u);
+    void push_back(TimeType t, StateType x, InputType u, CostType J);
 
 
     //--------------------------------------------------------------------------
@@ -139,12 +145,12 @@ private:
     //--------------------------------------------------------------------------
     // Private Member Variables
     //--------------------------------------------------------------------------
-    vector<TimeType> time_tape_;     // Time tape
-    unsigned int N_;               // State dimension
+    vector<TimeType> time_tape_;   // Time tape
+    unsigned int n_;               // State dimension
     vector<StateType> state_tape_; // State tape
-    unsigned int M_;               // Input dimension
+    unsigned int m_;               // Input dimension
     vector<InputType> input_tape_; // Input tape
-
+    vector<CostType> cost_tape_;   // Total cost tape
 
 }; // class
 //------------------------------------------------------------------------------

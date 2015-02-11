@@ -118,28 +118,52 @@ public:
     TimeType time() const { return t_; };
     void time_step(TimeType ts) { ts_ = ts; };
     TimeType time_step() const { return ts_; };
-    void state_dim(unsigned int N) { N_ = N; };
-    unsigned int state_dim() const { return N_; };
-    void input_dim(unsigned int M) { M_ = M; };
-    unsigned int input_dim() const { return M_; };
-    void output_dim(unsigned int L) { L_ = L; };
-    unsigned int ouput_dim() const { return L_; };
+    void state_dim(unsigned int n) { n_ = n; };
+    unsigned int state_dim() const { return n_; };
+    void input_dim(unsigned int m) { m_ = m; };
+    unsigned int input_dim() const { return m_; };
+    void output_dim(unsigned int l) { l_ = l; };
+    unsigned int ouput_dim() const { return l_; };
 
 
     //--------------------------------------------------------------------------
     // Public Member Functions
     //--------------------------------------------------------------------------
     /**
-     * @brief Obtain input from state and time.
+     * @brief Outputs input from state and time.
      * @details Outputs system input based on state and time using the current
      *     controller and input constraints functions defined by the user.
      *
-     * @param x State vector (N x 1)
+     * @param x State vector (n x 1)
      * @param t Time value
      *
-     * @return Input vector (M x 1)
+     * @return Input vector (m x 1)
      */
     InputType input(StateType x, TimeType t);
+
+    /**
+     * @brief Outputs instantaneous cost from state, input, and time.
+     * @details Outputs instantaneous cost based on the state cost, input cost,
+     *     and time cost functions defined by the user.
+     *
+     * @param x State vector (n x 1)
+     * @param u Input vector (m x 1)
+     * @param t Time value
+     * @return Instantaneous cost
+     */
+    CostType instantaneous_cost(StateType x, InputType u, TimeType t);
+
+    /**
+     * @brief Outputs final cost from state and time.
+     * @details Outputs final cost based state final cost and time final cost
+     *     functions defined by the user.
+     *
+     * @param xf Final state vector (n x 1)
+     * @param tf Final time value
+     *
+     * @return Final cost
+     */
+    CostType final_cost(StateType xf, TimeType tf);
 
     /**
      * @brief Simulate the system forward or backward in time
@@ -148,11 +172,11 @@ public:
      *     actual states of the system. To actually evolve the system use the
      *     `run` method.
      *
-     * @param init_state Initial state vector (N x 1)
+     * @param init_state Initial state vector (n x 1)
      * @param init_time Initial time
      * @param duration Time duration of simulation
      * @param dir Direction of time evolution
-     * @return State at final time of simulation (N x 1)
+     * @return State at final time of simulation (n x 1)
      */
      Trajectory simulate(StateType init_state,
                          TimeType init_time,
@@ -170,30 +194,89 @@ public:
      * @details This function maps from state, input, and time to the state
      * derivative.
      *
-     * @param x State vector (N x 1)
-     * @param u Input vector (M x 1)
+     * @param x State vector (n x 1)
+     * @param u Input vector (m x 1)
      * @param t Time value
-     * @return State derivative vector (N x 1)
+     * @return State derivative vector (n x 1)
      */
-    function< StateType (StateType x, VectorXd u, TimeType t) > dynamics;
+    function< StateType (StateType x, InputType u, TimeType t) > dynamics;
+
+    /**
+     * @brief System instantaneous time cost function pointer.
+     * @details This function returns instantaneous cost for the given time
+     *     value.
+     *
+     * @param t Time value
+     * @return Cost value
+     */
+    function< CostType (TimeType t) > time_cost;
+
+    /**
+     * @brief System instantaneous state cost function pointer.
+     * @details This function returns instantaneous cost for the given state
+     *     value.
+     *
+     * @param x State vector (n x 1)
+     * @return Cost value
+     */
+    function< CostType (StateType x) > state_cost;
+
+    /**
+     * @brief System instantaneous input cost function pointer.
+     * @details This function returns instantaneous cost for the given input
+     *     value.
+     *
+     * @param u Input vector (m x 1)
+     * @return Cost value
+     */
+    function< CostType (InputType u) > input_cost;
+
+    /**
+     * @brief System final time cost function pointer.
+     * @details This function returns final cost for the given time
+     *     value.
+     *
+     * @param tf Final time value
+     * @return Cost value
+     */
+    function< CostType (TimeType tf) > final_time_cost;
+
+    /**
+     * @brief System final state cost function pointer.
+     * @details This function returns final cost for the given state
+     *     value.
+     *
+     * @param xf Final state vector (n x 1)
+     * @return Cost value
+     */
+    function< CostType (StateType xf) > final_state_cost;
 
     /**
      * @brief System controller function pointer.
      * @details This function maps from state and time to input.
      *
-     * @param x State vector (N x 1)
+     * @param x State vector (n x 1)
      * @param t Time value
      *
-     * @return Input vector (M x 1)
+     * @return Input vector (m x 1)
      */
     function< InputType (StateType x, TimeType t) > controller;
 
     /**
-     * @brief System input constraint function pointer.
-     * @details This functions constraints the input a given set of values.
+     * @brief System state constraint function pointer.
+     * @details This functions constrains the state to a given set of values.
      *
-     * @param u Unconstrained input vector (M x 1)
-     * @return Constrained input vector (M x 1)
+     * @param x Unconstrained state vector (n x 1)
+     * @return Constrained state vector (n x 1)
+     */
+    function< StateType (StateType x) > state_constraint;
+
+    /**
+     * @brief System input constraint function pointer.
+     * @details This functions constrains the input to a given set of values.
+     *
+     * @param u Unconstrained input vector (m x 1)
+     * @return Constrained input vector (m x 1)
      */
     function< InputType (InputType u) > input_constraint;
 
@@ -232,12 +315,16 @@ private:
     // System parameters
     TimeType t_ = 0.0; // Current time
     TimeType ts_;      // Time step
-    unsigned int N_;   // State dimension
+    unsigned int n_;   // State dimension
     StateType x_;      // Current state
-    unsigned int M_;   // Input dimension
+    unsigned int m_;   // Input dimension
     InputType u_;      // Current input
-    unsigned int L_;   // Output dimension
+    unsigned int l_;   // Output dimension
     OutputType y_;     // Current output
+    CostType L_;       // Instantaneous cost
+    CostType cum_L_;   // Cumulative instantaneous cost
+    CostType final_L_; // Final cost
+    CostType J_;       // Total cost
 
 
 }; // class
