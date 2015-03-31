@@ -139,26 +139,21 @@ Trajectory System::simulate(StateType init_state,
 
     // Initialize integration variables
     Stepper stepper;
-        // Stepper always integrates from 0 to allow for forward and backward
-        // integration. The time is corrected in the loop and function call.
-    stepper.initialize(init_state, 0, duration*init_step_factor_);
-    pair< TimeType, TimeType > time_interval;
-
     auto dyn = [this, dir, t0] (const StateType x,
                                 StateType &dxdt,
                                 const TimeType t)
     {
-        dxdt = dir*dynamics(x, input(x, dir*t+t0), dir*t+t0);
+        // cout << "t: " << t << ", u: " << input_interpolation(input(x, dir*t+t0)) << endl;
+        dxdt = dir*dynamics(x, input_interpolation(input(x, dir*t+t0)), dir*t+t0);
     };
 
     TimeType t = t0;
     TimeType tf = t0 + dir*duration;
-    TimeType t2;
+    TimeType t_stepper = 0;
     int k = 1;
 
     StateType x = init_state;
     StateType xf;
-    InputType u(m_);
     CostType L = 0;
     CostType cum_L = L;
     CostType final_L = final_cost(x, t);
@@ -167,32 +162,26 @@ Trajectory System::simulate(StateType init_state,
     Trajectory traj(n_,m_);
 
     // Simulate
-    u = input(x, t);
-    traj.push_back(t, x, u, J);
-    t = dir*k*ts_ + t0;
-    while (dir*t < dir*tf) { // Step forward some interval until final time
-        time_interval = stepper.do_step(dyn);
-        t2 = t0 + dir*time_interval.second;
-        // For all system time steps in interval record time, state, and input
-        while (dir*t<dir*t2 && dir*t<dir*tf) {
-            stepper.calc_state(dir*(t-t0), x);
-            u = input(x, t);
-            L = instantaneous_cost(x, u, t);
-            cum_L += L;
-            final_L = final_cost(x, t);
-            J = cum_L + final_L;
+    u_ = input(x, t);
+    traj.reserve(floor(duration/ts_)+1);
+    traj.push_back(t, x, u_, J);
+    t = t0;
+    StateType dxdt;
+    while (dir*t < dir*tf - 1e-10) { // Step forward some interval until final time
+        // t_stepper = dir*(t - t0);
+        // stepper.do_step(dyn, x, t_stepper, ts_);
+        t += dir*ts_;
+        u_ = input(x, dir*t);
+        dxdt = dir*dynamics(x, u_, t);
+        x = x + dxdt * ts_;
 
-            traj.push_back(t, x, u, J);
-            k++;
-            t = dir*k*ts_ + t0;
-        }
+        // u_ = input(x, t);
+        L = instantaneous_cost(x, u_, t);
+        cum_L += L;
+        final_L = final_cost(x, t);
+        J = cum_L + final_L;
+        traj.push_back(t, x, u_, J);
     }
-    stepper.calc_state(dir*(tf-t0), xf);
-    u = input(xf, tf);
-    final_L = final_cost(xf, tf);
-    J = cum_L + final_L;
-    traj.push_back(tf, xf, u, J);
-
     return traj;
 }
 
@@ -206,6 +195,15 @@ Trajectory System::simulate(StateType init_state,
 //------------------------------------------------------------------------------
 // Private Member Functions
 //------------------------------------------------------------------------------
+InputType System::input_interpolation(InputType u)
+{
+    switch (input_interp_method) {
+        case CONT:
+            return u;
+        case ZOH:
+            return u_;
+    }
+}
 
 
 } // namespace optimal

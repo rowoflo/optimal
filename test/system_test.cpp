@@ -53,9 +53,9 @@ int main(int argc, char *argv[])
     double DISTURBANCE = -2;  ///< Disturbance (wind) [N]
     double HEIGHT = 5;        ///< Desired height [m]
 
-    TimeType t0 = 4.0;        ///< Initial time [s]
-    TimeType tf = 12.0;        ///< Final time [s]
-    TimeType ts = 0.1;        ///< Time step [s]
+    TimeType t0 = 0.0;        ///< Initial time [s]
+    TimeType tf = 8.0;        ///< Final time [s]
+    TimeType ts = 0.01;        ///< Time step [s]
 
     const unsigned int n = 3; ///< State dimension
     StateType x0(n);          ///< Initial state vector
@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
 
     ControllerParams params;
     params.constant = 12.0;
-    params.pid = {10, 0, 5};
+    params.pid = {10, .5, 5};
 
     switch (controller_type) {
         case NONE:
@@ -163,16 +163,29 @@ int main(int argc, char *argv[])
     };
 
     // Simulate
+    auto tstart = chrono::high_resolution_clock::now();
     Trajectory traj = sys.simulate(x0, t0, tf-t0);
+    auto elapsed = chrono::high_resolution_clock::now() - tstart;
+    long long microseconds = chrono::duration_cast<chrono::microseconds>(elapsed).count();
     StateType xf = traj.state(traj.size()-1);
     cout << traj << endl;
     cout << xf.transpose() << endl;
+    cout << "Run time: " << (double)microseconds/1e6 << endl;
 
     // StateType xf(n);
     // xf << 5.18125, -0.00929819, -3.53298;
     // Trajectory traj = sys.simulate(xf, tf, tf-t0, optimal::System::BACKWARD);
-    traj = sys.simulate(xf, tf, tf-t0, optimal::System::BACKWARD);
-    cout << traj << endl;
+
+    // tstart = chrono::high_resolution_clock::now();
+    // traj = sys.simulate(xf, tf, tf-t0, optimal::System::BACKWARD);
+    // elapsed = chrono::high_resolution_clock::now() - tstart;
+    // microseconds = chrono::duration_cast<chrono::microseconds>(elapsed).count();
+    // cout << "Run time: " << (double)microseconds/1e6 << endl;
+
+
+    // x0 = traj.state(traj.size()-1);
+    // // cout << traj << endl;
+    // cout << x0.transpose() << endl;
 
 
 

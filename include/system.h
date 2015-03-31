@@ -39,8 +39,11 @@ namespace optimal
 //------------------------------------------------------------------------------
 // Typedefs
 //------------------------------------------------------------------------------
-typedef dense_output_runge_kutta
-    <controlled_runge_kutta< runge_kutta_dopri5< StateType > > > Stepper;
+// typedef dense_output_runge_kutta
+//     <controlled_runge_kutta< runge_kutta_dopri5< StateType > > > Stepper;
+
+typedef runge_kutta4< StateType > Stepper;
+
 
 /**
 * @class System
@@ -70,6 +73,11 @@ public:
     enum Direction {
         FORWARD = 1,
         BACKWARD = -1
+    };
+
+    enum InputInterpMethod {
+        CONT = 0,
+        ZOH = 1
     };
 
 
@@ -303,7 +311,14 @@ private:
     //--------------------------------------------------------------------------
     // Private Member Functions
     //--------------------------------------------------------------------------
-
+    /**
+     * @brief Outputs interpolated input between sample times.
+     * @details
+     *
+     * @param u [description]
+     * @return [description]
+     */
+    InputType input_interpolation(InputType u);
 
 
     //--------------------------------------------------------------------------
@@ -311,6 +326,7 @@ private:
     //--------------------------------------------------------------------------
     // Code parameters
     TimeType init_step_factor_ = 1/10.0;
+    InputInterpMethod input_interp_method = ZOH;
 
     // System parameters
     TimeType t_ = 0.0; // Current time
@@ -318,9 +334,9 @@ private:
     unsigned int n_;   // State dimension
     StateType x_;      // Current state
     unsigned int m_;   // Input dimension
-    InputType u_;      // Current input
+    InputType u_;      // Input
     unsigned int l_;   // Output dimension
-    OutputType y_;     // Current output
+    OutputType y_;     // Output
     CostType L_;       // Instantaneous cost
     CostType cum_L_;   // Cumulative instantaneous cost
     CostType final_L_; // Final cost

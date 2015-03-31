@@ -107,6 +107,7 @@ public:
     // Public Member Functions
     //--------------------------------------------------------------------------
     unsigned int size() const { return time_tape_.size(); };
+    void reserve(unsigned int n);
     void push_back(TimeType t, StateType x);
     void push_back(TimeType t, StateType x, InputType u);
     void push_back(TimeType t, StateType x, InputType u, CostType J);

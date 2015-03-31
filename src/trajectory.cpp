@@ -92,6 +92,13 @@ std::ostream& operator<< (std::ostream &out, Trajectory &traj)
 //------------------------------------------------------------------------------
 // Public Member Functions
 //------------------------------------------------------------------------------
+void Trajectory::reserve(unsigned int n)
+{
+    time_tape_.reserve(n);
+    state_tape_.reserve(n);
+    input_tape_.reserve(n);
+    cost_tape_.reserve(n);
+}
 void Trajectory::push_back(TimeType t, StateType x)
 {
     InputType u;
